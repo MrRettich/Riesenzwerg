@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+
+# Load default environment variables (.env)
+load_dotenv()
+
 import openai
 import os
 import requests
@@ -5,18 +10,26 @@ import uuid
 from flask import Flask, request, jsonify, send_file, render_template
 
 
-# Add your OpenAI API key
-OPENAI_API_KEY = ""
-openai.api_key = OPENAI_API_KEY
+################################################################
+## Edit the variables in the dotenv file.
+## You'll need an OpenAI API key and an Elevenlabs API key.
 
-# Add your ElevenLabs API key
-ELEVENLABS_API_KEY = ""
-ELEVENLABS_VOICE_STABILITY = 0.30
-ELEVENLABS_VOICE_SIMILARITY = 0.75
+#OpenAI environment
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
-# Choose your favorite ElevenLabs voice
-ELEVENLABS_VOICE_NAME = "Hugh"
+# Elevenlabs environment
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
+ELEVENLABS_VOICE_STABILITY = os.getenv("ELEVENLABS_VOICE_STABILITY", "")
+ELEVENLABS_VOICE_SIMILARITY = os.getenv("ELEVENLABS_VOICE_SIMILARITY", "")
+ELEVENLABS_VOICE_MODEL = os.getenv("ELEVENLABS_VOICE_MODEL", "")
+ELEVENLABS_VOICE_NAME = os.getenv("ELEVENLABS_VOICE_NAME", "")
 ELEVENLABS_ALL_VOICES = []
+
+# AI system preset
+OPENAI_AI_SYSTEM_TEXT = os.getenv("OPENAI_AI_SYSTEM_TEXT", "")
+
+# API Keys
+openai.api_key = OPENAI_API_KEY
 
 app = Flask(__name__)
 
@@ -60,7 +73,7 @@ def generate_reply(conversation: list) -> str:
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
       messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "system", "content": OPENAI_AI_SYSTEM_TEXT},
         ] + conversation
     )
     return response["choices"][0]["message"]["content"]
@@ -89,6 +102,7 @@ def generate_audio(text: str, output_path: str = "") -> str:
     }
     data = {
         "text": text,
+        "model_id": ELEVENLABS_VOICE_MODEL,
         "voice_settings": {
             "stability": ELEVENLABS_VOICE_STABILITY,
             "similarity_boost": ELEVENLABS_VOICE_SIMILARITY,
