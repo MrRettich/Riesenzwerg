@@ -71,7 +71,7 @@ def generate_reply(conversation: list) -> str:
 
     """
     response = openai.ChatCompletion.create(
-      model="gpt-3.5-turbo",
+      model="gpt-4-1106-preview",
       messages=[
             {"role": "system", "content": OPENAI_AI_SYSTEM_TEXT},
         ] + conversation
